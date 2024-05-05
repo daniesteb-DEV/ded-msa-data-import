@@ -1,0 +1,10 @@
+server:
+  port: ${GENERIC_WS_PORT}
+logging:
+  config: logback.xml
+  level:
+    dev.daniesteb: ${GENERIC_LOG_LEVEL}
+  sendLog: false
+  tracer:
+    exclusion:
+      uri: actuator, swagger,api-docs,csrf

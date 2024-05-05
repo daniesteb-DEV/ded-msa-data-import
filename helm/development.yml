@@ -1,0 +1,11 @@
+variables:
+  own:
+    config:
+      - name: ENVIRONMENT
+        value: "development"
+      - name: GENERIC_WS_PORT
+        value: "8080"
+      - name: GENERIC_WS_PORT_SERVICE
+        value: "80"
+      - name: GENERIC_LOG_LEVEL
+        value: "debug"

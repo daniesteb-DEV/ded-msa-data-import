@@ -1,0 +1,12 @@
+info:
+  project:
+    name: ded-msa-data-import
+    version: 1.0.0
+spring:
+  application:
+    name: ded-msa-data-import
+    main:
+      allow-bean-definition-overriding: on
+      lazy-initialization: on
+    web-flux:
+      base-path: /channel/cash-management/v1
