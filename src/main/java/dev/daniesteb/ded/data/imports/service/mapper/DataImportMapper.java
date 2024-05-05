@@ -15,8 +15,5 @@ import org.mapstruct.*;
 )
 public interface DataImportMapper {
     DataImport toDataSourceInfo(PostDataImportRequest postDataImportRequest);
-
-    FileInfo toFileInfo(dev.daniesteb.ded.data.imports.infrastructure.input.rest.bean.FileInfo fileInfo);
-
     PostDataImport200Response toPostDataImport200Response(DetailValidatedFile detailValidatedFile);
 }
