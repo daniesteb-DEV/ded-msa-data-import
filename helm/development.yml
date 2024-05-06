@@ -8,4 +8,59 @@ variables:
       - name: GENERIC_WS_PORT_SERVICE
         value: "80"
       - name: GENERIC_LOG_LEVEL
-        value: "debug"
+        value: DEBUG
+  common:
+    config: {}
+    secret: {}
+global:
+  environment: "development"
+  replicaCount: "1"
+  revisionHistoryLimit: "5"
+  minReadySeconds: "0"
+  version: "v1"
+
+container:
+  project: "development"
+  registry: ""
+  tag: "2019.11.25-16.30.32"
+  pullPolicy: "Always"
+  livenessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          if [ "$(curl -s http://localhost:8080/api/daniesteb-dev/v1/data-imports/actuator/health | cut -d "{" -f 2 | cut -d "}" -f 1 | cut -d "," -f 1 )" != '"status":"UP"' ];then exit 1; fi
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    failureThreshold: 12
+  readinessProbe:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          if [ "$(curl -s http://localhost:8080/api/daniesteb-dev/v1/data-imports/actuator/health | cut -d "{" -f 2 | cut -d "}" -f 1 | cut -d "," -f 1 )" != '"status":"UP"' ];then exit 1; fi
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    failureThreshold: 12
+  resources:
+    requests:
+      cpu: 150m
+      memory: 640Mi
+    limits:
+      memory: 1024Mi
+  port:
+    - name: msa-port
+      servicePort: 80
+      containerPort: 8080
+      protocol: TCP
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 1
+  targetMemory: 768Mi
+  targetCpu: 150m
+
+pdb:
+  minAvailable: 1

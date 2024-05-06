@@ -1,10 +1,13 @@
 server:
-  port: ${GENERIC_WS_PORT}
+  port: 8080
 logging:
-  config: logback.xml
   level:
-    dev.daniesteb: ${GENERIC_LOG_LEVEL}
-  sendLog: false
+    dev.daniesteb: DEBUG
   tracer:
     exclusion:
       uri: actuator, swagger,api-docs,csrf
+spring:
+  r2dbc:
+    url: r2dbc:pool:mssql://207.180.254.176:1433/HP_Codesa17
+    password: desa21
+    username: desa

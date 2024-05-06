@@ -25,7 +25,7 @@ paths:
       operationId: PostDataImport
       requestBody:
         content:
-          json/application:
+          application/json:
             schema:
               type: object
               properties:
@@ -38,7 +38,7 @@ paths:
                       minLength: 1
                       maxLength: 100
                       examples:
-                        - Asientos
+                        - seating
                     fileBase64:
                       type: string
                       format: base64
@@ -109,6 +109,153 @@ paths:
                             - 10047
         "400":
           description: "invalid input, object invalid"
+  /data-imports/validate:
+    post:
+      tags:
+        - Data Import
+      summary: The endpoint that import data from file to database
+      description: Data import
+      operationId: PostDataImportValidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileInfo:
+                  type: object
+                  properties:
+                    fileId:
+                      type: string
+                      description: Upload file fileId
+                      minLength: 36
+                      maxLength: 36
+                      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+                      examples:
+                        - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+                    fileType:
+                      type: string
+                      description: File type to process
+                      minLength: 1
+                      maxLength: 100
+                      examples:
+                        - seating
+                dataSourceInfo:
+                  type: object
+                  properties:
+                    hostName:
+                      type: string
+                      description: Host name
+                      minLength: 1
+                      maxLength: 200
+                      examples:
+                        - 200.181.255.178
+                    user:
+                      type: string
+                      description: User of data source
+                      minLength: 1
+                      maxLength: 50
+                      examples:
+                        - daniesteb
+                    password:
+                      type: string
+                      description: Password of data source
+                      minLength: 1
+                      maxLength: 100
+                      examples:
+                        - daniestebPassword
+                    database:
+                      type: string
+                      description: Database name
+                      minLength: 1
+                      maxLength: 100
+                      examples:
+                        - uscrpd
+        description: Data to connect datasource
+      responses:
+        "200":
+          description: data imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileDetailErrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        line:
+                          type: string
+                          minLength: 2
+                          maxLength: 150
+                          description: Line of file with error
+                          examples:
+                            - L6
+                        description:
+                          type: string
+                          description: Error description
+                          examples:
+                            - Empty value field
+                        value:
+                          type: string
+                          description: Value to be processed in the service
+                          examples:
+                            - 10047
+        "400":
+          description: "invalid input, object invalid"
+  /data-imports/upload:
+    post:
+      tags:
+        - Data Import
+      summary: The endpoint that import data from file to database
+      description: Data import
+      operationId: PostDataImportUpload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: binary file to process
+                  examples:
+                    - SGVsbG8sIFdvcmxkIQ
+                fileName:
+                  type: string
+                  description: File name to process
+                  minLength: 1
+                  maxLength: 100
+                  examples:
+                    - Asientos-canorus.xlsx
+                fileType:
+                  type: string
+                  description: File type to process
+                  minLength: 1
+                  maxLength: 100
+                  examples:
+                    - seating
+        description: Data to connect datasource
+      responses:
+        "200":
+          description: data imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileId:
+                    type: string
+                    description: Upload file fileId
+                    minLength: 36
+                    maxLength: 36
+                    pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+                    examples:
+                      - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+        "400":
+          description: "invalid input, object invalid"
 components:
   parameters:
     FileToProcess:
@@ -131,7 +278,7 @@ components:
               minLength: 1
               maxLength: 100
               examples:
-                - Asientos
+                - seating
             fileBase64:
               type: string
               format: base64
@@ -194,6 +341,117 @@ components:
                 description: Value to be processed in the service
                 examples:
                   - 10047
+    PostDataImportValidateRequest:
+      type: object
+      properties:
+        fileInfo:
+          type: object
+          properties:
+            fileId:
+              type: string
+              description: Upload file fileId
+              minLength: 36
+              maxLength: 36
+              pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+              examples:
+                - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+            fileType:
+              type: string
+              description: File type to process
+              minLength: 1
+              maxLength: 100
+              examples:
+                - seating
+        dataSourceInfo:
+          type: object
+          properties:
+            hostName:
+              type: string
+              description: Host name
+              minLength: 1
+              maxLength: 200
+              examples:
+                - 200.181.255.178
+            user:
+              type: string
+              description: User of data source
+              minLength: 1
+              maxLength: 50
+              examples:
+                - daniesteb
+            password:
+              type: string
+              description: Password of data source
+              minLength: 1
+              maxLength: 100
+              examples:
+                - daniestebPassword
+            database:
+              type: string
+              description: Database name
+              minLength: 1
+              maxLength: 100
+              examples:
+                - uscrpd
+    PostDataImportValidateResponse:
+      type: object
+      properties:
+        fileDetailErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              line:
+                type: string
+                minLength: 2
+                maxLength: 150
+                description: Line of file with error
+                examples:
+                  - L6
+              description:
+                type: string
+                description: Error description
+                examples:
+                  - Empty value field
+              value:
+                type: string
+                description: Value to be processed in the service
+                examples:
+                  - 10047
+    PostDataImportUploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: binary file to process
+          examples:
+            - SGVsbG8sIFdvcmxkIQ
+        fileName:
+          type: string
+          description: File name to process
+          minLength: 1
+          maxLength: 100
+          examples:
+            - Asientos-canorus.xlsx
+        fileType:
+          type: string
+          description: File type to process
+          minLength: 1
+          maxLength: 100
+          examples:
+            - seating
+    PostDataImportUploadResponse:
+      type: object
+      properties:
+        fileId:
+          type: string
+          description: Upload file fileId
+          minLength: 36
+          maxLength: 36
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          examples:
+            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
     FileDetailError:
       type: object
       properties:
@@ -217,19 +475,21 @@ components:
     FileInfo:
       type: object
       properties:
+        fileId:
+          type: string
+          description: Upload file fileId
+          minLength: 36
+          maxLength: 36
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          examples:
+            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
         fileType:
           type: string
           description: File type to process
           minLength: 1
           maxLength: 100
           examples:
-            - Asientos
-        fileBase64:
-          type: string
-          format: base64
-          description: file to process in base 64
-          examples:
-            - SGVsbG8sIFdvcmxkIQ
+            - seating
     DataSourceInfo:
       type: object
       properties:
@@ -289,13 +549,34 @@ components:
       maxLength: 100
       examples:
         - uscrpd
+    FileId:
+      type: string
+      description: Upload file fileId
+      minLength: 36
+      maxLength: 36
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      examples:
+        - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
     FileType:
       type: string
       description: File type to process
       minLength: 1
       maxLength: 100
       examples:
-        - Asientos
+        - seating
+    FileName:
+      type: string
+      description: File name to process
+      minLength: 1
+      maxLength: 100
+      examples:
+        - Asientos-canorus.xlsx
+    File:
+      type: string
+      format: binary
+      description: binary file to process
+      examples:
+        - SGVsbG8sIFdvcmxkIQ
     FileBase64:
       type: string
       format: base64

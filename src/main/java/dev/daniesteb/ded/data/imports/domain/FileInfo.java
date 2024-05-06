@@ -11,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Generated
 public class FileInfo {
-    String fileBase64;
+    String fileId;
+    String fileName;
     String fileType;
+    String fileBase64;
 }

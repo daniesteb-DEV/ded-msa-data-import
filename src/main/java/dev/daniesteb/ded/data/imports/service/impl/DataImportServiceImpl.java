@@ -3,6 +3,7 @@ package dev.daniesteb.ded.data.imports.service.impl;
 import dev.daniesteb.ded.data.imports.domain.DataImport;
 import dev.daniesteb.ded.data.imports.domain.DetailValidatedFile;
 import dev.daniesteb.ded.data.imports.domain.FileDetailError;
+import dev.daniesteb.ded.data.imports.domain.FileInfo;
 import dev.daniesteb.ded.data.imports.service.DataImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,14 +13,13 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -30,15 +30,25 @@ public class DataImportServiceImpl implements DataImportService {
     public Mono<DetailValidatedFile> importFileData(DataImport dataImport) {
         log.info("|-> importFileData started in service");
         return Mono.just(dataImport)
-                   .mapNotNull(dataImportRequest -> getFileFromBase64(dataImport.getFileInfo()
-                                                                                .getFileType(),
-                                                                      dataImportRequest.getFileInfo()
+                   .mapNotNull(dataImportRequest -> getFileFromBase64(dataImportRequest.getFileInfo()
                                                                                        .getFileBase64()))
                    .mapNotNull(file -> validateFile(file, dataImport.getFileInfo()
                                                                     .getFileType()))
                    .doOnSuccess(response -> log.info("|-> importFileData finished successfully."))
                    .doOnError(error -> log.error("|-> importFileData finished with error. ErrorDetail: {}",
                                                  error.getMessage()));
+    }
+
+    @Override
+    public Mono<DetailValidatedFile> validateFileData(DataImport dataImport) {
+        log.info("|-> validateFileData started in service");
+        return Mono.empty();
+    }
+
+    @Override
+    public Mono<FileInfo> uploadFile(Flux<Part> file, String fileName, String fileType) {
+        log.info("|-> uploadFile started in service");
+        return null;
     }
 
     private static DetailValidatedFile validateFile(File file, String fileType) {
@@ -51,10 +61,12 @@ public class DataImportServiceImpl implements DataImportService {
         return detailValidatedFile;
     }
 
-    private static File getFileFromBase64(String fileType, String fileBase64) {
+    private static File getFileFromBase64(String fileBase64) {
         try {
             byte[] dataBytes = Base64.decodeBase64(fileBase64);
-            File file = File.createTempFile("temp" + fileType, "xlsx");
+            File file = File.createTempFile(UUID.randomUUID()
+                                                .toString(), ".xlsx");
+            log.info("Temp file create: {}", file.getName());
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
             outputStream.write(dataBytes);
             return file;

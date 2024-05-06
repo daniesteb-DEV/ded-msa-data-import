@@ -3,10 +3,22 @@ info:
     name: ded-msa-data-import
     version: 1.0.0
 spring:
+  profiles:
+    active: development
   application:
     name: ded-msa-data-import
-    main:
-      allow-bean-definition-overriding: on
-      lazy-initialization: on
-    web-flux:
-      base-path: /channel/cash-management/v1
+  main:
+    allow-bean-definition-overriding: on
+    lazy-initialization: on
+  web-flux:
+    base-path: /api/daniesteb-dev/v1
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, loggers
+      base-path: /data-imports/actuator
