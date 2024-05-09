@@ -12,7 +12,5 @@ import lombok.experimental.FieldDefaults;
 @Generated
 public class FileInfo {
     String fileId;
-    String fileName;
-    String fileType;
-    String fileBase64;
+    String fileTemplateType;
 }

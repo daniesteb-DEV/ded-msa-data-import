@@ -2,7 +2,6 @@ package dev.daniesteb.ded.data.imports.controller;
 
 import dev.daniesteb.ded.data.imports.infrastructure.input.rest.DataImportsApi;
 import dev.daniesteb.ded.data.imports.infrastructure.input.rest.bean.PostDataImport200Response;
-import dev.daniesteb.ded.data.imports.infrastructure.input.rest.bean.PostDataImportRequest;
 import dev.daniesteb.ded.data.imports.infrastructure.input.rest.bean.PostDataImportUpload200Response;
 import dev.daniesteb.ded.data.imports.infrastructure.input.rest.bean.PostDataImportValidateRequest;
 import dev.daniesteb.ded.data.imports.service.DataImportService;
@@ -24,27 +23,24 @@ public class DataImportController implements DataImportsApi {
     private final DataImportMapper dataImportMapper;
 
     @Override
-    public Mono<ResponseEntity<PostDataImport200Response>> postDataImport(PostDataImportRequest postDataImportRequest,
+    public Mono<ResponseEntity<PostDataImport200Response>> postDataImport(Flux<Part> file,
+                                                                          String fileTemplateType,
                                                                           ServerWebExchange exchange) {
         log.info("|-> postDataImport started in controller");
-        return Mono.just(postDataImportRequest)
-                   .map(dataImportMapper::toDataSourceInfo)
-                   .flatMap(dataImportService::importFileData)
-                   .map(dataImportMapper::toPostDataImport200Response)
-                   .map(ResponseEntity::ok)
-                   .doOnError(error -> log.error(
-                           "|-> postDataImport finished with error. ErrorDetail: {}",
-                           error.getMessage()))
-                   .doOnSuccess(response -> log.info("|-> postDataImport finished successfully."));
+        return dataImportService.importFileData(file, fileTemplateType)
+                                .map(dataImportMapper::toPostDataImport200Response)
+                                .map(ResponseEntity::ok)
+                                .doOnError(error -> log.error(
+                                        "|-> postDataImport finished with error. ErrorDetail: {}",
+                                        error.getMessage()))
+                                .doOnSuccess(response -> log.info("|-> postDataImport finished successfully."));
     }
 
     @Override
     public Mono<ResponseEntity<PostDataImportUpload200Response>> postDataImportUpload(Flux<Part> file,
-                                                                                      String fileName,
-                                                                                      String fileType,
                                                                                       ServerWebExchange exchange) {
         log.info("|-> postDataImportUpload started in controller");
-        return dataImportService.uploadFile(file, fileName, fileType)
+        return dataImportService.uploadFile(file)
                                 .map(dataImportMapper::toPostDataImportUpload200Response)
                                 .map(ResponseEntity::ok)
                                 .doOnError(error -> log.error(
@@ -57,6 +53,12 @@ public class DataImportController implements DataImportsApi {
     public Mono<ResponseEntity<PostDataImport200Response>> postDataImportValidate(PostDataImportValidateRequest postDataImportValidateRequest,
                                                                                   ServerWebExchange exchange) {
         log.info("|-> postDataImportValidate started in controller");
-        return null;
+        return dataImportService.validateFileData(dataImportMapper.toFileInfo(postDataImportValidateRequest))
+                                .map(dataImportMapper::toPostDataImport200Response)
+                                .map(ResponseEntity::ok)
+                                .doOnError(error -> log.error(
+                                        "|-> postDataImportValidate finished with error. ErrorDetail: {}",
+                                        error.getMessage()))
+                                .doOnSuccess(response -> log.info("|-> postDataImportValidate finished successfully."));
     }
 }

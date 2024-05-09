@@ -1,6 +1,5 @@
 package dev.daniesteb.ded.data.imports.service;
 
-import dev.daniesteb.ded.data.imports.domain.DataImport;
 import dev.daniesteb.ded.data.imports.domain.DetailValidatedFile;
 import dev.daniesteb.ded.data.imports.domain.FileInfo;
 import org.springframework.http.codec.multipart.Part;
@@ -10,9 +9,9 @@ import reactor.core.publisher.Mono;
 
 @Validated
 public interface DataImportService {
-    Mono<DetailValidatedFile> importFileData(DataImport dataImport);
+    Mono<DetailValidatedFile> importFileData(Flux<Part> file, String fileTemplateType);
 
-    Mono<DetailValidatedFile> validateFileData(DataImport dataImport);
+    Mono<DetailValidatedFile> validateFileData(FileInfo fileInfo);
 
-    Mono<FileInfo> uploadFile(Flux<Part> file, String fileName, String fileType);
+    Mono<FileInfo> uploadFile(Flux<Part> file);
 }

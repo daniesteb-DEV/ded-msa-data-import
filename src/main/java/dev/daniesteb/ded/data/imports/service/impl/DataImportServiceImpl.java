@@ -1,24 +1,28 @@
 package dev.daniesteb.ded.data.imports.service.impl;
 
-import dev.daniesteb.ded.data.imports.domain.DataImport;
+import com.azure.core.util.FluxUtil;
 import dev.daniesteb.ded.data.imports.domain.DetailValidatedFile;
 import dev.daniesteb.ded.data.imports.domain.FileDetailError;
 import dev.daniesteb.ded.data.imports.domain.FileInfo;
 import dev.daniesteb.ded.data.imports.service.DataImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.*;
 
 @Service
@@ -27,28 +31,64 @@ import java.util.*;
 public class DataImportServiceImpl implements DataImportService {
 
     @Override
-    public Mono<DetailValidatedFile> importFileData(DataImport dataImport) {
+    public Mono<DetailValidatedFile> importFileData(Flux<Part> file, String fileTemplateType) {
         log.info("|-> importFileData started in service");
-        return Mono.just(dataImport)
-                   .mapNotNull(dataImportRequest -> getFileFromBase64(dataImportRequest.getFileInfo()
-                                                                                       .getFileBase64()))
-                   .mapNotNull(file -> validateFile(file, dataImport.getFileInfo()
-                                                                    .getFileType()))
-                   .doOnSuccess(response -> log.info("|-> importFileData finished successfully."))
-                   .doOnError(error -> log.error("|-> importFileData finished with error. ErrorDetail: {}",
-                                                 error.getMessage()));
+        return createFileToProcess(file).map(fileToProcess -> validateFile(fileToProcess, fileTemplateType))
+                                        .doOnSuccess(response -> log.info(
+                                                "|-> importFileData in service finished successfully."))
+                                        .doOnError(error -> log.error(
+                                                "|-> importFileData in service finished with error. ErrorDetail: {}",
+                                                error.getMessage()));
     }
 
     @Override
-    public Mono<DetailValidatedFile> validateFileData(DataImport dataImport) {
+    public Mono<FileInfo> uploadFile(Flux<Part> file) {
+        log.info("|-> uploadFile started in service");
+        return createFileToProcess(file).map(fileToProcess -> FileInfo.builder()
+                                                                      .fileId(Objects.requireNonNull(fileToProcess)
+                                                                                     .getName()
+                                                                                     .split("\\.")[0])
+                                                                      .build())
+                                        .doOnSuccess(response -> log.info(
+                                                "|-> uploadFile {} in service finished successfully.",
+                                                response.getFileId()))
+                                        .doOnError(error -> log.error(
+                                                "|-> uploadFile in service finished with error. ErrorDetail: {}",
+                                                error.getMessage()));
+    }
+
+    @Override
+    public Mono<DetailValidatedFile> validateFileData(FileInfo fileInfo) {
         log.info("|-> validateFileData started in service");
         return Mono.empty();
     }
 
-    @Override
-    public Mono<FileInfo> uploadFile(Flux<Part> file, String fileName, String fileType) {
-        log.info("|-> uploadFile started in service");
-        return null;
+    private static Mono<File> createFileToProcess(Flux<Part> file) {
+        return FluxUtil.collectBytesInByteBufferStream(file.filter(part -> part instanceof FilePart)
+                                                           .ofType(FilePart.class)
+                                                           .flatMap(filePart -> filePart.content()
+                                                                                        .map(dataBuffer -> {
+                                                                                            byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                                                                            dataBuffer.read(
+                                                                                                    bytes);
+                                                                                            DataBufferUtils.release(
+                                                                                                    dataBuffer);
+                                                                                            return bytes;
+                                                                                        }))
+                                                           .map(ByteBuffer::wrap))
+                       .mapNotNull(bytes -> createFileTemp(bytes,
+                                                           UUID.randomUUID()
+                                                               .toString()));
+    }
+
+    private static File createFileTemp(byte[] byteData, String fileName) {
+        try {
+            File fileToValid = File.createTempFile(fileName, ".xlsx");
+            Files.write(fileToValid.toPath(), byteData);
+            return fileToValid;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static DetailValidatedFile validateFile(File file, String fileType) {
@@ -59,20 +99,6 @@ public class DataImportServiceImpl implements DataImportService {
             default -> detailValidatedFile = null;
         }
         return detailValidatedFile;
-    }
-
-    private static File getFileFromBase64(String fileBase64) {
-        try {
-            byte[] dataBytes = Base64.decodeBase64(fileBase64);
-            File file = File.createTempFile(UUID.randomUUID()
-                                                .toString(), ".xlsx");
-            log.info("Temp file create: {}", file.getName());
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
-            outputStream.write(dataBytes);
-            return file;
-        } catch (IOException ex) {
-            return null;
-        }
     }
 
     private static DetailValidatedFile validateFileSeatingData(File fileWithData) {

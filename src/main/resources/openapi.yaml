@@ -6,7 +6,7 @@ info:
   contact:
     name: Daniesteb DEV - Daniel Jimenez
     email: danielejimeneza@gmail.com
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/DanielJimenez-287/ded-msa-data-import/1.0.0
@@ -25,152 +25,23 @@ paths:
       operationId: PostDataImport
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
-                fileInfo:
-                  type: object
-                  properties:
-                    fileType:
-                      type: string
-                      description: File type to process
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - seating
-                    fileBase64:
-                      type: string
-                      format: base64
-                      description: file to process in base 64
-                      examples:
-                        - SGVsbG8sIFdvcmxkIQ
-                dataSourceInfo:
-                  type: object
-                  properties:
-                    hostName:
-                      type: string
-                      description: Host name
-                      minLength: 1
-                      maxLength: 200
-                      examples:
-                        - 200.181.255.178
-                    user:
-                      type: string
-                      description: User of data source
-                      minLength: 1
-                      maxLength: 50
-                      examples:
-                        - daniesteb
-                    password:
-                      type: string
-                      description: Password of data source
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - daniestebPassword
-                    database:
-                      type: string
-                      description: Database name
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - uscrpd
-        description: Data to connect datasource
-      responses:
-        "200":
-          description: data imported
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  fileDetailErrors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        line:
-                          type: string
-                          minLength: 2
-                          maxLength: 150
-                          description: Line of file with error
-                          examples:
-                            - L6
-                        description:
-                          type: string
-                          description: Error description
-                          examples:
-                            - Empty value field
-                        value:
-                          type: string
-                          description: Value to be processed in the service
-                          examples:
-                            - 10047
-        "400":
-          description: "invalid input, object invalid"
-  /data-imports/validate:
-    post:
-      tags:
-        - Data Import
-      summary: The endpoint that import data from file to database
-      description: Data import
-      operationId: PostDataImportValidate
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                fileInfo:
-                  type: object
-                  properties:
-                    fileId:
-                      type: string
-                      description: Upload file fileId
-                      minLength: 36
-                      maxLength: 36
-                      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-                      examples:
-                        - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
-                    fileType:
-                      type: string
-                      description: File type to process
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - seating
-                dataSourceInfo:
-                  type: object
-                  properties:
-                    hostName:
-                      type: string
-                      description: Host name
-                      minLength: 1
-                      maxLength: 200
-                      examples:
-                        - 200.181.255.178
-                    user:
-                      type: string
-                      description: User of data source
-                      minLength: 1
-                      maxLength: 50
-                      examples:
-                        - daniesteb
-                    password:
-                      type: string
-                      description: Password of data source
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - daniestebPassword
-                    database:
-                      type: string
-                      description: Database name
-                      minLength: 1
-                      maxLength: 100
-                      examples:
-                        - uscrpd
+                file:
+                  type: string
+                  format: binary
+                  description: binary file to process
+                  examples:
+                    - SGVsbG8sIFdvcmxkIQ
+                fileTemplateType:
+                  type: string
+                  description: File template type to process
+                  minLength: 1
+                  maxLength: 100
+                  examples:
+                    - seating
         description: Data to connect datasource
       responses:
         "200":
@@ -223,20 +94,6 @@ paths:
                   description: binary file to process
                   examples:
                     - SGVsbG8sIFdvcmxkIQ
-                fileName:
-                  type: string
-                  description: File name to process
-                  minLength: 1
-                  maxLength: 100
-                  examples:
-                    - Asientos-canorus.xlsx
-                fileType:
-                  type: string
-                  description: File type to process
-                  minLength: 1
-                  maxLength: 100
-                  examples:
-                    - seating
         description: Data to connect datasource
       responses:
         "200":
@@ -250,10 +107,70 @@ paths:
                     type: string
                     description: Upload file fileId
                     minLength: 36
-                    maxLength: 36
-                    pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+                    maxLength: 55
+                    pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
                     examples:
                       - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+        "400":
+          description: "invalid input, object invalid"
+  /data-imports/validate:
+    post:
+      tags:
+        - Data Import
+      summary: The endpoint that import data from file to database
+      description: Data import
+      operationId: PostDataImportValidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileId:
+                  type: string
+                  description: Upload file fileId
+                  minLength: 36
+                  maxLength: 55
+                  pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+                  examples:
+                    - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+                fileTemplateType:
+                  type: string
+                  description: File template type to process
+                  minLength: 1
+                  maxLength: 100
+                  examples:
+                    - seating
+      responses:
+        "200":
+          description: data imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileDetailErrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        line:
+                          type: string
+                          minLength: 2
+                          maxLength: 150
+                          description: Line of file with error
+                          examples:
+                            - L6
+                        description:
+                          type: string
+                          description: Error description
+                          examples:
+                            - Empty value field
+                        value:
+                          type: string
+                          description: Value to be processed in the service
+                          examples:
+                            - 10047
         "400":
           description: "invalid input, object invalid"
 components:
@@ -269,53 +186,19 @@ components:
     PostDataImportRequest:
       type: object
       properties:
-        fileInfo:
-          type: object
-          properties:
-            fileType:
-              type: string
-              description: File type to process
-              minLength: 1
-              maxLength: 100
-              examples:
-                - seating
-            fileBase64:
-              type: string
-              format: base64
-              description: file to process in base 64
-              examples:
-                - SGVsbG8sIFdvcmxkIQ
-        dataSourceInfo:
-          type: object
-          properties:
-            hostName:
-              type: string
-              description: Host name
-              minLength: 1
-              maxLength: 200
-              examples:
-                - 200.181.255.178
-            user:
-              type: string
-              description: User of data source
-              minLength: 1
-              maxLength: 50
-              examples:
-                - daniesteb
-            password:
-              type: string
-              description: Password of data source
-              minLength: 1
-              maxLength: 100
-              examples:
-                - daniestebPassword
-            database:
-              type: string
-              description: Database name
-              minLength: 1
-              maxLength: 100
-              examples:
-                - uscrpd
+        file:
+          type: string
+          format: binary
+          description: binary file to process
+          examples:
+            - SGVsbG8sIFdvcmxkIQ
+        fileTemplateType:
+          type: string
+          description: File template type to process
+          minLength: 1
+          maxLength: 100
+          examples:
+            - seating
     PostDataImportResponse:
       type: object
       properties:
@@ -344,55 +227,21 @@ components:
     PostDataImportValidateRequest:
       type: object
       properties:
-        fileInfo:
-          type: object
-          properties:
-            fileId:
-              type: string
-              description: Upload file fileId
-              minLength: 36
-              maxLength: 36
-              pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-              examples:
-                - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
-            fileType:
-              type: string
-              description: File type to process
-              minLength: 1
-              maxLength: 100
-              examples:
-                - seating
-        dataSourceInfo:
-          type: object
-          properties:
-            hostName:
-              type: string
-              description: Host name
-              minLength: 1
-              maxLength: 200
-              examples:
-                - 200.181.255.178
-            user:
-              type: string
-              description: User of data source
-              minLength: 1
-              maxLength: 50
-              examples:
-                - daniesteb
-            password:
-              type: string
-              description: Password of data source
-              minLength: 1
-              maxLength: 100
-              examples:
-                - daniestebPassword
-            database:
-              type: string
-              description: Database name
-              minLength: 1
-              maxLength: 100
-              examples:
-                - uscrpd
+        fileId:
+          type: string
+          description: Upload file fileId
+          minLength: 36
+          maxLength: 55
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+          examples:
+            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+        fileTemplateType:
+          type: string
+          description: File template type to process
+          minLength: 1
+          maxLength: 100
+          examples:
+            - seating
     PostDataImportValidateResponse:
       type: object
       properties:
@@ -427,20 +276,6 @@ components:
           description: binary file to process
           examples:
             - SGVsbG8sIFdvcmxkIQ
-        fileName:
-          type: string
-          description: File name to process
-          minLength: 1
-          maxLength: 100
-          examples:
-            - Asientos-canorus.xlsx
-        fileType:
-          type: string
-          description: File type to process
-          minLength: 1
-          maxLength: 100
-          examples:
-            - seating
     PostDataImportUploadResponse:
       type: object
       properties:
@@ -448,8 +283,8 @@ components:
           type: string
           description: Upload file fileId
           minLength: 36
-          maxLength: 36
-          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          maxLength: 55
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
           examples:
             - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
     FileDetailError:
@@ -479,107 +314,35 @@ components:
           type: string
           description: Upload file fileId
           minLength: 36
-          maxLength: 36
-          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          maxLength: 55
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
           examples:
             - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
-        fileType:
+        fileTemplateType:
           type: string
-          description: File type to process
+          description: File template type to process
           minLength: 1
           maxLength: 100
           examples:
             - seating
-    DataSourceInfo:
-      type: object
-      properties:
-        hostName:
-          type: string
-          description: Host name
-          minLength: 1
-          maxLength: 200
-          examples:
-            - 200.181.255.178
-        user:
-          type: string
-          description: User of data source
-          minLength: 1
-          maxLength: 50
-          examples:
-            - daniesteb
-        password:
-          type: string
-          description: Password of data source
-          minLength: 1
-          maxLength: 100
-          examples:
-            - daniestebPassword
-        database:
-          type: string
-          description: Database name
-          minLength: 1
-          maxLength: 100
-          examples:
-            - uscrpd
-    HostName:
-      type: string
-      description: Host name
-      minLength: 1
-      maxLength: 200
-      examples:
-        - 200.181.255.178
-    User:
-      type: string
-      description: User of data source
-      minLength: 1
-      maxLength: 50
-      examples:
-        - daniesteb
-    Password:
-      type: string
-      description: Password of data source
-      minLength: 1
-      maxLength: 100
-      examples:
-        - daniestebPassword
-    Database:
-      type: string
-      description: Database name
-      minLength: 1
-      maxLength: 100
-      examples:
-        - uscrpd
     FileId:
       type: string
       description: Upload file fileId
       minLength: 36
-      maxLength: 36
-      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      maxLength: 55
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
       examples:
-        - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
-    FileType:
+        - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
+    FileTemplateType:
       type: string
-      description: File type to process
+      description: File template type to process
       minLength: 1
       maxLength: 100
       examples:
         - seating
-    FileName:
-      type: string
-      description: File name to process
-      minLength: 1
-      maxLength: 100
-      examples:
-        - Asientos-canorus.xlsx
     File:
       type: string
       format: binary
       description: binary file to process
-      examples:
-        - SGVsbG8sIFdvcmxkIQ
-    FileBase64:
-      type: string
-      format: base64
-      description: file to process in base 64
       examples:
         - SGVsbG8sIFdvcmxkIQ

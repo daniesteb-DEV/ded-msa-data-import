@@ -21,11 +21,11 @@ plugins {
 }
 
 def packageName = "dev.daniesteb.ded.data.imports"
-def dirName="dev/daniesteb/ded/data/imports"
+def dirName = "dev/daniesteb/ded/data/imports"
 def buildDir = "${projectDir}/build"
 
 springBoot {
-    mainClass="${packageName}.MainApplication"
+    mainClass = "${packageName}.MainApplication"
 }
 
 apply plugin: "java"
@@ -83,10 +83,16 @@ dependencies {
     implementation "org.apache.poi:poi:${apachepoiVersion}"
     implementation "org.apache.poi:poi-ooxml:${apachepoiVersion}"
 
+    // azure.core
+    implementation 'com.azure:azure-core:1.49.0'
+
     // JDBC Reactive
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'io.r2dbc:r2dbc-spi'
     implementation 'io.r2dbc:r2dbc-mssql'
+
+    // google guava
+    implementation 'com.google.guava:guava:33.2.0-jre'
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -97,7 +103,7 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 }
 
-tasks.register('buildSpringServer', GenerateTask){
+tasks.register('buildSpringServer', GenerateTask) {
     generatorName = "spring"
     templateDir = "${rootDir}/src/main/resources/openapi-templates"
     inputSpec = "${rootDir}/src/main/resources/openapi.yaml".toString()
@@ -123,7 +129,7 @@ tasks.register('buildSpringServer', GenerateTask){
     ]
 }
 
-compileJava{
+compileJava {
     dependsOn buildSpringServer
     options.compilerArgs += [
             "-Amapstruct.suppressGeneratorTimestamp=true",
@@ -133,21 +139,21 @@ compileJava{
     ]
 }
 
-sourceSets.main.java.srcDirs = ["${buildDir}/generated/src/main/java","src/main/java"]
+sourceSets.main.java.srcDirs = ["${buildDir}/generated/src/main/java", "src/main/java"]
 
-springBoot{
+springBoot {
     buildInfo()
 }
 
-test{
+test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
 
-jacocoTestReport{
+jacocoTestReport {
     dependsOn test
     afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect{
+        classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
                     "${dirName}/domain/mapper/*Impl.class",
                     "${dirName}/infrastructure/input/adapter/rest/**/*.class",
