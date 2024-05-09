@@ -107,10 +107,10 @@ paths:
                     type: string
                     description: Upload file fileId
                     minLength: 36
-                    maxLength: 55
-                    pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+                    maxLength: 36
+                    pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
                     examples:
-                      - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+                      - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
         "400":
           description: "invalid input, object invalid"
   /data-imports/validate:
@@ -130,10 +130,10 @@ paths:
                   type: string
                   description: Upload file fileId
                   minLength: 36
-                  maxLength: 55
-                  pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+                  maxLength: 36
+                  pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
                   examples:
-                    - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+                    - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
                 fileTemplateType:
                   type: string
                   description: File template type to process
@@ -231,10 +231,10 @@ components:
           type: string
           description: Upload file fileId
           minLength: 36
-          maxLength: 55
-          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+          maxLength: 36
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
           examples:
-            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+            - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
         fileTemplateType:
           type: string
           description: File template type to process
@@ -283,10 +283,10 @@ components:
           type: string
           description: Upload file fileId
           minLength: 36
-          maxLength: 55
-          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+          maxLength: 36
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
           examples:
-            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+            - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
     FileDetailError:
       type: object
       properties:
@@ -314,10 +314,10 @@ components:
           type: string
           description: Upload file fileId
           minLength: 36
-          maxLength: 55
-          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+          maxLength: 36
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
           examples:
-            - 2e9ad08c-a5d2-4eef-a4f6-d9cb2526e393
+            - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
         fileTemplateType:
           type: string
           description: File template type to process
@@ -329,8 +329,8 @@ components:
       type: string
       description: Upload file fileId
       minLength: 36
-      maxLength: 55
-      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{31}$"
+      maxLength: 36
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
       examples:
         - 7db919d8-0546-466a-8089-6ac580a0bec51367374247113519371
     FileTemplateType:

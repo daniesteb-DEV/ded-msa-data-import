@@ -33,7 +33,11 @@ public class DataImportServiceImpl implements DataImportService {
     @Override
     public Mono<DetailValidatedFile> importFileData(Flux<Part> file, String fileTemplateType) {
         log.info("|-> importFileData started in service");
-        return createFileToProcess(file).map(fileToProcess -> validateFile(fileToProcess, fileTemplateType))
+        return createFileToProcess(file).map(fileToProcess -> {
+                                            DetailValidatedFile detailValidatedFile = validateFile(fileToProcess, fileTemplateType);
+                                            fileToProcess.delete();
+                                            return detailValidatedFile;
+                                        })
                                         .doOnSuccess(response -> log.info(
                                                 "|-> importFileData in service finished successfully."))
                                         .doOnError(error -> log.error(
@@ -60,7 +64,18 @@ public class DataImportServiceImpl implements DataImportService {
     @Override
     public Mono<DetailValidatedFile> validateFileData(FileInfo fileInfo) {
         log.info("|-> validateFileData started in service");
-        return Mono.empty();
+        return Mono.just(new File(System.getProperty("java.io.tmpdir")
+                                        .concat(fileInfo.getFileId()
+                                                        .concat(".xlsx"))))
+                   .map(fileToProcess -> {
+                       DetailValidatedFile detailValidatedFile = validateFile(fileToProcess,
+                                                                              fileInfo.getFileTemplateType());
+                       fileToProcess.delete();
+                       return detailValidatedFile;
+                   })
+                   .doOnSuccess(response -> log.info("|-> validateFileData in service finished successfully."))
+                   .doOnError(error -> log.error("|-> validateFileData in service finished with error. ErrorDetail: {}",
+                                                 error.getMessage()));
     }
 
     private static Mono<File> createFileToProcess(Flux<Part> file) {
@@ -83,7 +98,8 @@ public class DataImportServiceImpl implements DataImportService {
 
     private static File createFileTemp(byte[] byteData, String fileName) {
         try {
-            File fileToValid = File.createTempFile(fileName, ".xlsx");
+            File fileToValid = new File(System.getProperty("java.io.tmpdir")
+                                              .concat(fileName.concat(".xlsx")));
             Files.write(fileToValid.toPath(), byteData);
             return fileToValid;
         } catch (Exception e) {
